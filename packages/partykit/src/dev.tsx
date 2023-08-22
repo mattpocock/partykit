@@ -44,6 +44,24 @@ class ReloadedEvent extends Event implements ReloadedEventOptions {
   }
 }
 
+let nodeModulesToIgnore = [
+  "assert",
+  "async_hooks",
+  "buffer",
+  "diagnostics_channel",
+  "events",
+  "path",
+  "process",
+  "stream",
+  "string_decoder",
+  "util",
+];
+// add node: prefixes to each into the same array
+nodeModulesToIgnore = [
+  ...nodeModulesToIgnore,
+  ...nodeModulesToIgnore.map((module) => `node:${module}`),
+];
+
 interface ErrorEventOptions {
   error: unknown;
 }
@@ -414,7 +432,7 @@ function useDev(options: DevProps): { inspectorUrl: string | undefined } {
         minify: options.minify,
         format: "esm",
         sourcemap: true,
-        external: ["__STATIC_ASSETS_MANIFEST__"],
+        external: ["__STATIC_ASSETS_MANIFEST__", ...nodeModulesToIgnore],
         define: {
           PARTYKIT_HOST: `"127.0.0.1:1999"`,
           ...esbuildOptions.define,

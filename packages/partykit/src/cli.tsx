@@ -32,6 +32,24 @@ function sleep(ms: number) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
+let nodeModulesToIgnore = [
+  "assert",
+  "async_hooks",
+  "buffer",
+  "diagnostics_channel",
+  "events",
+  "path",
+  "process",
+  "stream",
+  "string_decoder",
+  "util",
+];
+// add node: prefixes to each into the same array
+nodeModulesToIgnore = [
+  ...nodeModulesToIgnore,
+  ...nodeModulesToIgnore.map((module) => `node:${module}`),
+];
+
 // duplicate dev.tsx
 function* findAllFiles(
   root: string,
@@ -290,6 +308,7 @@ export async function deploy(options: {
         ...esbuildOptions.define,
         ...config.define,
       },
+      external: nodeModulesToIgnore,
       plugins: [
         {
           name: "partykit-wasm-publish",
